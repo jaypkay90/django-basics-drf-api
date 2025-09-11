@@ -30,19 +30,19 @@ def studentsView(request):
     # return JsonResponse(student_list, safe=False)
 
     if request.method == 'GET':
-        # Get all students from DB
+        # Get all students from DB -> Studenten werden als QuerySet aus DB gezogen
         students = Student.objects.all()
 
         # many=True -> mehrere Students werden übergeben -> ohne many=True erwartet der Serializer ein einzelnes Objekt
-        # In dieser Zeile macht der StudentSerializer aus den Studenten aus der DB Python-Datenstrukturen (Dicts/Listen), die leicht in JSON umgewandelt werden können
+         # In dieser Zeile macht der StudentSerializer aus den Studenten-QuerySet ein Serializer-Objekt. Die Daten sind als Dictionary-Liste in serializer.data
         serializer = StudentSerializer(students, many=True)
 
-        # serializer.data = Python-Datenstrukturen (Listen/Dictionaries)
+        # serializer.data = Liste aus Dictionaries
         # Daten werden als JSON zurückgeben
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     elif request.method == 'POST':
-        # Deserialisierung -> JSON-Daten aus Frontend wird in ein internes Datenobjekt um, das dann überprüft/validiert werden kann
+        # Deserialisierung -> JSON-Daten aus Frontend werden in einem Serializer-Objekt gespeichert
         serializer = StudentSerializer(data=request.data)
 
         # Validierung -> Entsprechen die Daten den Regeln, die im Student-Model festgelegt worden sind?
@@ -56,7 +56,46 @@ def studentsView(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
-
+@api_view(['GET', 'PUT', 'DELETE'])
 def studentDetailView(request, pk):
+    try:
+        # Student mit dem entsprechenden Primary Key als einzelnes Objekt aus der DB ziehen
+        student = Student.objects.get(pk=pk)
     
+    # Student mit PK nicht existent -> 404
+    except Student.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    
+    # Student lesen/Infos aus DB ziehen
+    if request.method == 'GET':
+        # In dieser Zeile macht der StudentSerializer aus dem Student ein Serializer-Objekt. Die Daten sind als Dictionary in serializer.data
+        serializer = StudentSerializer(student)
+
+        # Rückgabe der Daten im JSON-Format
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    # Student updaten
+    elif request.method == 'PUT':
+        # Wir müssen dem serializer hier das Student-Objekt mitgeben! Tun wir das nicht, wird ein neues Student-Objekt erzeugt
+        # In dieser Zeile macht der StudentSerializer aus dem spezifizierten Studenten, der über die API per PUT geupdated werden soll, ein Serializer-Objekt
+        # Die Daten aus dem Frontend sind in request.data
+        serializer = StudentSerializer(student, data=request.data)
+
+        # Validierung -> Entsprechen die Daten den Regeln, die im Student-Model festgelegt worden sind?
+        if serializer.is_valid():
+            # Änderungen werden gespeichert und in DB geschrieben
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Student aus DB löschen
+    elif request.method == 'DELETE':
+        # Student aus DB löschen
+        student.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    
+
+
     
