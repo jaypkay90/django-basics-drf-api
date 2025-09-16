@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'students',
     'api',
+    'employees',
+    'blogs',
 ]
 
 MIDDLEWARE = [
@@ -123,3 +125,16 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+REST_FRAMEWORK = {
+    # Global Pagination mit den Klasse PageNumberPagination oder LimitOffsetPagination
+    # WICHTIG: DAS FUNKTIONIERT NUR MIT GENERIC VIEWS UND VIEWSETS!
+    # Für Mixins und APIView muss man Custom Pagination implementieren
+    
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    # 'PAGE_SIZE': 2
+
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 2
+}
