@@ -12,6 +12,7 @@ from django.http import Http404
 from rest_framework import mixins, generics, viewsets
 from blogs.models import Blog, Comment
 from blogs.serializers import BlogSerializer, CommentSerializer
+from .paginations import CustomPagination
 
 # Create your views here.
 '''FUNCTION BASED VIEWS'''
@@ -272,6 +273,9 @@ class EmployeeViewset(viewsets.ViewSet):
 class EmployeeViewset(viewsets.ModelViewSet):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
+
+    # Custom Pagination implementieren -> festglegt in .paginations.py
+    pagination_class = CustomPagination
 
 
 '''BLOG VIEWS'''

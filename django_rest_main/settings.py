@@ -128,10 +128,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 REST_FRAMEWORK = {
-    # Global Pagination mit den Klasse PageNumberPagination oder LimitOffsetPagination
+    # GLOBAL PAGINATION mit den Klasse PageNumberPagination oder LimitOffsetPagination
+    # Global Pagination bedeutet: Jede API-View wird automatisch diese Pagination verwenden
     # WICHTIG: DAS FUNKTIONIERT NUR MIT GENERIC VIEWS UND VIEWSETS!
     # Für Mixins und APIView muss man Custom Pagination implementieren
-    
+
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     # 'PAGE_SIZE': 2
 
