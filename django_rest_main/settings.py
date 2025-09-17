@@ -42,6 +42,9 @@ INSTALLED_APPS = [
     'api',
     'employees',
     'blogs',
+
+    # Filtering
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -134,8 +137,21 @@ REST_FRAMEWORK = {
     # Für Mixins und APIView muss man Custom Pagination implementieren
 
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    # 'PAGE_SIZE': 2
+    # 'PAGE_SIZE': 2,
 
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 2
+    'PAGE_SIZE': 2,
+
+    # Global Filtering -> Alle Views unterstützen durch diese Einstellung Filtering
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+
+    # SearchFilter
+    # Standardmäßig heißt der Queryparameter des SearchFilters in der URL 'search' -> http://127.0.0.1:8000/api/v1/blogs/?search=Blog
+    # Dieser Parametername wird hier geändert -> http://127.0.0.1:8000/api/v1/blogs/?q=Description+2
+    'SEARCH_PARAM': 'q',
+
+    # Ordering Filter
+    # Standardmäßig heißt der Queryparameter in der URL 'ordering' -> http://127.0.0.1:8000/api/v1/blogs/?ordering=blog_title
+    # Dieser Parametername wird hier geændert -> http://127.0.0.1:8000/api/v1/blogs/?order-by=blog_title
+    'ORDERING_PARAM': 'order-by',
 }

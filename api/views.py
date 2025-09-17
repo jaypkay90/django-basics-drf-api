@@ -13,6 +13,10 @@ from rest_framework import mixins, generics, viewsets
 from blogs.models import Blog, Comment
 from blogs.serializers import BlogSerializer, CommentSerializer
 from .paginations import CustomPagination
+from employees.filters import EmployeeFilter
+
+# SearchFilter und OrderingFilter
+from rest_framework.filters import SearchFilter, OrderingFilter
 
 # Create your views here.
 '''FUNCTION BASED VIEWS'''
@@ -277,12 +281,36 @@ class EmployeeViewset(viewsets.ModelViewSet):
     # Custom Pagination implementieren -> festglegt in .paginations.py
     pagination_class = CustomPagination
 
+    # Global Filtering implementieren -> festglegt in settings.py
+    # Filterung der Employee-Liste nach Designation
+    # Problem mit dieser Version: Die Filterung funktioniert nur, wenn der gewünschte Wert 1:1 eingegeben wird
+    # -> Wenn im Datensatz "Software Developer" steht, funktioniert z.B. "software developer" nicht
+    # filterset_fields = ['designation']
+
+    # Custom Filter -> implementiert in employees.filters.py
+    filterset_class = EmployeeFilter
+
 
 '''BLOG VIEWS'''
 # Wir wollen für Blog und Kommentare nur zwei CRUD-Operationen realisieren: Create (neuen Blog oder Kommentar erstellen) und List (alle Blogs und Kommentare anzeigen)
 class BlogView(generics.ListCreateAPIView):
     queryset = Blog.objects.all()
     serializer_class = BlogSerializer
+
+    # SearchFilter und OrderingFilter
+    filter_backends = [SearchFilter, OrderingFilter]
+
+    # Search Filter implementieren -> die Felder 'blog_title' und 'blog_body' können caseinsensitive durchsucht werden
+    # Die angegebenen Feldnamen müssen mit den Feldnamen im Blog-Model identisch sein
+    # Standardmäßig heißt der Queryparameter in der URL 'search' -> http://127.0.0.1:8000/api/v1/blogs/?search=Blog
+    # Dies kann aber in settings.py geändert werden
+    search_fields = ['blog_title', 'blog_body'] 
+    # '^blog_title' -> wenn das Feld mit ^ am Anfang eingegeben wird, werden nur blog_title herausgfiltert, die mit dem eingegebenen String beginnen
+
+    # Ordering Filter
+    # Standardmäßig heißt der Queryparameter in der URL 'ordering' -> http://127.0.0.1:8000/api/v1/blogs/?ordering=blog_title
+    # Auch das kann in settings.py geändert werden
+    ordering_fields = ['id', 'blog_title']
 
 class CommentsView(generics.ListCreateAPIView):
     queryset = Comment.objects.all()
